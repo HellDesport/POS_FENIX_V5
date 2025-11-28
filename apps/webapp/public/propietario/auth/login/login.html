@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fénix | Iniciar sesión (Propietario)</title>
+
+  <!-- OJO: desde /propietario/auth/login/ a /propietario/styles => ../../ -->
+<link rel="stylesheet" href="/styles/base.css" />
+<link rel="stylesheet" href="/styles/auth.css" />
+<link rel="icon" href="/assets/icons/logo.svg" type="image/svg+xml" />
+</head>
+<body>
+  <main class="auth-card">
+    <header class="auth-header">
+      <img src="../../../assets/icons/logo.svg" alt="Fénix" onerror="this.style.display='none'">
+      <h1>Iniciar sesión (Propietario)</h1>
+    </header>
+
+    <form id="frmLogin" novalidate>
+      <label>Email
+        <input id="email" name="email" type="email" inputmode="email"
+               placeholder="tu@oasis.mx" required />
+      </label>
+
+      <label>Contraseña
+        <div class="pwd-wrap">
+          <input id="password" name="password" type="password" minlength="6" required />
+          <button id="btnTogglePwd" type="button" class="link">Mostrar</button>
+        </div>
+      </label>
+
+      <label style="display:flex;align-items:center;gap:.5rem;">
+        <input id="remember" type="checkbox" />
+        Recuérdame (autologin en este dispositivo)
+      </label>
+
+      <button id="btnSubmit" class="btn" type="submit">Entrar</button>
+      <p id="msg" class="msg muted" role="status" aria-live="polite"></p>
+    </form>
+
+    <nav class="auth-links">
+      <a href="./forgot.html">¿Olvidaste tu contraseña?</a>
+      <span class="sep">·</span>
+      <a href="../register/register.html">Crear cuenta</a>
+    </nav>
+  </main>
+
+  <!-- Lógica del login propietario -->
+  <script type="module" src="../auth.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const e = document.getElementById('email'); e && e.focus();
+    });
+  </script>
+</body>
+</html>

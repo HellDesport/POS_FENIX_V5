@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fénix | Acceso Terminal</title>
+
+  <!-- Estilos comunes (mismos para TODOS los logins) -->
+  <!-- Estamos en /terminal/auth -> subimos 2 niveles -->
+  <link rel="stylesheet" href="../../styles/base.css" />
+  <link rel="stylesheet" href="../../styles/auth.css" />
+
+  <!-- Icono/logo general -->
+  <link rel="icon" href="../../assets/icons/logo.svg" type="image/svg+xml" />
+</head>
+<body>
+  <main class="auth-card">
+    <header class="auth-header">
+      <img src="../../assets/icons/logo.svg" alt="Fénix" onerror="this.style.display='none'">
+      <h1>Iniciar sesión (Terminal)</h1>
+    </header>
+
+    <form id="frmLogin" autocomplete="on" novalidate>
+      <label>Usuario / Email
+        <input id="email" name="email" type="email" inputmode="email"
+               placeholder="caja1@restaurante.mx" required />
+      </label>
+
+      <label>Contraseña
+        <div class="pwd-wrap">
+          <input id="password" name="password" type="password" minlength="4" required />
+          <button id="btnTogglePwd" type="button" class="link">Mostrar</button>
+        </div>
+      </label>
+
+      <button id="btnSubmit" class="btn" type="submit">Entrar</button>
+      <p id="msg" class="msg muted" role="status" aria-live="polite"></p>
+    </form>
+  </main>
+
+  <!-- Lógica de login específica de TERMINAL -->
+  <script type="module" src="./auth.terminal.js"></script>
+
+  <!-- UX: enfocar email al cargar -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const e = document.getElementById('email');
+      e && e.focus();
+    });
+  </script>
+</body>
+</html>

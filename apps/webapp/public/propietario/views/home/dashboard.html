@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fénix | Panel del Propietario</title>
+
+  <!-- estilos -->
+  <link rel="stylesheet" href="../../../styles/base.css" />
+  <link rel="stylesheet" href="../../../styles/dashboard.css" />
+
+  <link rel="icon" href="../../../assets/icons/logo.svg" type="image/svg+xml" />
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <header class="brand">
+        <img src="../../../assets/icons/logo.svg" alt="Fénix" onerror="this.style.display='none'">
+        <div>
+          <h1>SISTEMA_POS</h1>
+          <p class="muted">• Resumen</p>
+        </div>
+      </header>
+
+      <section class="kpi-col">
+        <article class="kpi">
+          <h3>Venta del día</h3>
+          <div class="kpi-value">
+            <span id="kpi_venta_dia">$0.00</span> <small>MXN</small>
+          </div>
+          <p class="muted"><span id="kpi_info_dia">—</span></p>
+        </article>
+
+        <article class="kpi">
+          <h3>Tickets</h3>
+          <div class="kpi-num"><span id="kpi_tickets">0</span></div>
+          <p class="muted">
+            Semana: <span id="kpi_tickets_sem">0</span> ·
+            Prom/día: <span id="kpi_tickets_prom">0</span>
+          </p>
+        </article>
+
+        <article class="kpi">
+          <h3>Órdenes abiertas</h3>
+          <div class="kpi-num"><span id="kpi_ordenes_abiertas">0</span></div>
+          <p class="muted">en curso</p>
+        </article>
+
+        <article class="kpi">
+          <h3>Mesas</h3>
+          <div class="kpi-num"><span id="kpi_mesas">0</span></div>
+          <p class="muted">
+            <span id="kpi_mesas_txt">ocupadas/disponibles</span>
+          </p>
+        </article>
+
+        <article class="kpi">
+          <h3>Productos fuera</h3>
+          <div class="kpi-num"><span id="kpi_fuera_stock">0</span></div>
+          <p class="muted">no disponibles</p>
+        </article>
+
+        <article class="kpi">
+          <h3>Impresoras</h3>
+          <div class="kpi-num"><span id="kpi_impresoras">0</span></div>
+          <p class="muted">conectadas</p>
+        </article>
+      </section>
+
+      <button id="btnLogout" class="btn btn-danger w-full">Cerrar sesión</button>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="mainbar">
+        <h2>Configuración del Restaurante</h2>
+      </header>
+
+      <!-- Tarjetas de acciones -->
+      <section class="cards">
+        <article class="card">
+          <h3>Estado de restaurante</h3>
+          <p>Abre/Cierra operación, sesiones y mesas.</p>
+          <p class="muted">
+            Estatus: <b id="estado_restaurante">INACTIVO</b>
+          </p>
+          <div class="card-actions">
+            <!-- views/restaurante/restaurantes.html -->
+            <a class="btn" href="../restaurante/restaurantes.html">Administrar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Menú del restaurante</h3>
+          <p>Categorías, productos y disponibilidad.</p>
+          <p class="muted">
+            No disponibles: <b id="productos_no_disp">0</b>
+          </p>
+          <div class="card-actions">
+            <!-- views/ventas/menu.html -->
+            <a class="btn" href="../ventas/menu.html">Modificar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Dispositivos e impresoras</h3>
+          <p>Estado de terminales e impresoras.</p>
+          <p class="muted">
+            Conectadas: <b id="impresoras_conectadas">0</b>
+          </p>
+          <div class="card-actions">
+            <!-- views/dispositivos/dispositivos.html -->
+            <a class="btn" href="../dispositivos/dispositivos.html">Configurar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Tickets y corte</h3>
+          <p>Emitidos del día, venta y último corte.</p>
+          <p class="muted">
+            Hoy: <b id="tickets_hoy">0</b> — Venta:
+            <b id="venta_hoy">$0.00</b><br>
+            Último corte: <b id="ultimo_corte">—</b>
+          </p>
+          <div class="card-actions">
+            <!-- views/ventas/tickets.html -->
+            <a class="btn" href="../ventas/tickets.html">Ver tickets</a>
+            <a class="btn" href="../ventas/tickets.html">Órdenes</a>
+          </div>
+        </article>
+      </section>
+
+      <!-- Analítica -->
+      <section class="analytics" aria-label="Analítica del restaurante">
+        <!-- Fila A -->
+        <article class="chart-card span-2" aria-labelledby="t-ult7">
+          <header class="card-head">
+            <h3 id="t-ult7">Ventas últimos 7 días</h3>
+            <small class="muted" id="ult7_meta">
+              Total semana: — · vs semana anterior: —
+            </small>
+          </header>
+          <div class="chart-placeholder" role="img" aria-label="Gráfica de ventas por día">
+            <canvas id="ch_ventas_7d"></canvas>
+          </div>
+        </article>
+
+        <article class="chart-card span-2" aria-labelledby="t-hoyhora">
+          <header class="card-head">
+            <h3 id="t-hoyhora">Ventas por hora (hoy)</h3>
+            <small class="muted" id="hora_meta">Var. vs ayer: —</small>
+          </header>
+          <div class="chart-placeholder" role="img" aria-label="Gráfica de ventas por hora">
+            <canvas id="ch_ventas_hora"></canvas>
+          </div>
+        </article>
+
+        <!-- Fila B -->
+        <article clas

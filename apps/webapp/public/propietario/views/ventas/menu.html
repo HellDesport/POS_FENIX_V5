@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Fénix – Menú del restaurante</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/styles/menu.css">
+  <link rel="icon" href="/assets/icons/logo.svg" type="image/svg+xml" />
+</head>
+
+<body>
+
+  <!-- ===========================================================
+       HEADER
+  ============================================================ -->
+  <header class="menu-header">
+    <div class="mh-left">
+      <h1>Menú del restaurante</h1>
+      <span id="menuRestName" class="rest-nombre">—</span>
+
+      <p class="mh-desc">Configura categorías, subcategorías y productos del menú actual.</p>
+
+      <div class="mh-badges">
+        <button id="mesasConfigPill" class="mh-badge mh-clickable">
+          Mesas configuradas: <strong id="mesasConfigCount">0</strong>
+        </button>
+
+        <span id="restStatusPill" class="mh-badge">Restaurante ACTIVO</span>
+      </div>
+    </div>
+
+    <div class="mh-right">
+      <button id="btnVolverDashboard" class="mh-back">← Regresar al dashboard</button>
+    </div>
+  </header>
+
+
+  <!-- ===========================================================
+       LAYOUT PRINCIPAL
+  ============================================================ -->
+  <main class="menu-layout">
+
+    <!-- ======================= CATEGORÍAS ======================= -->
+    <section class="panel categorias-panel">
+      <header class="panel-header">
+        <h2>Categorías</h2>
+        <button id="btnNuevaCategoria" class="btn-accent">+</button>
+      </header>
+
+      <p id="categoryEmpty" class="empty-info" style="display:none;">
+        No hay categorías creadas.
+      </p>
+
+      <ul id="categoryList" class="lista-categorias fancy-list"></ul>
+    </section>
+
+
+    <!-- ======================= SUBCATEGORÍAS ======================= -->
+    <section class="panel subcategorias-panel">
+      <header class="panel-header">
+        <h2>Subcategorías <span id="subcatParentLabel"></span></h2>
+        <button id="btnNuevaSubcategoria" class="btn-accent">+</button>
+      </header>
+
+      <input 
+        id="subcatSearch"
+        type="text"
+        placeholder="Buscar subcategorías…"
+        class="input-search"
+      />
+
+      <p id="subcatEmpty" class="empty-info" style="display:none;">
+        No hay subcategorías en esta categoría.
+      </p>
+
+      <!-- BOTÓN AHORA SÍ FUNCIONAL -->
+      <button id="btnVerSubcatsSinAsignar" class="tag-warning">
+        <span id="tagSubcatsSinAsignar">Productos sin subcategoría: 0</span>
+      </button>
+
+      <ul id="subcatList" class="lista-subcategorias fancy-list"></ul>
+    </section>
+
+
+    <!-- ======================= PRODUCTOS ======================= -->
+    <section class="panel productos-panel">
+
+      <header class="panel-header">
+        <h2>Productos <span id="productosScopeLabel"></span></h2>
+        <button id="btnNuevoProducto" class="btn-accent">+</button>
+      </header>
+
+      <div class="products-header-tabs">
+        <div class="tab active" data-tab="subcat">De la subcategoría</div>
+        <div class="tab" id="tabProductosSinAsignar">Sin subcategoría</div>
+      </div>
+
+      <input 
+        id="productsSearch" 
+        type="text" 
+        placeholder="Buscar productos…" 
+        class="input-search"
+      />
+
+      <p id="productsEmpty" class="empty-info" style="display:none;">
+        No hay productos en este filtro.
+      </p>
+
+      <div id="productsList" class="products-list"></div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ===========================================================
+       OVERLAY PARA PANELES
+  ============================================================ -->
+  <div id="sideOverlay" class="side-overlay" hidden></div>
+
+
+  <!-- ===========================================================
+       PANEL CATEGORÍA
+  ============================================================ -->
+  <aside id="panelCategoriaForm" class="side-panel" hidden>
+    <header>
+      <h2 id="panelCategoriaFormTitle">Nueva categoría</h2>
+      <button data-close-panel class="close-btn">×</button>
+    </header>
+
+    <div class="panel-body">
+      <label>Nombre de la categoría</label>
+      <input id="catFormNombre" type="text" class="input-text">
+
+      <div class="panel-actions">
+        <button id="btnGuardarCategoria" class="btn-primary">Guardar</button>
+        <button id="btnEliminarCategoria" class="btn-danger" style="display:none;">Eliminar</button>
+      </div>
+    </div>
+  </aside>
+
+
+  <!-- ===========================================================
+       PANEL SUBCATEGORÍA
+  ============================================================ -->
+  <aside id="panelSubcatForm" class="side-panel" hidden>
+    <header>
+      <h2 id="panelSubcatFormTitle">Nueva subcategoría</h2>
+      <button data-close-panel class="close-btn">×</button>
+    </header>
+
+    <div class="panel-body">
+
+      <label>Categoría padre</label>
+      <select id="subcatFormPadre" class="input-text"></select>
+
+      <label>Nombre</label>
+      <input id="subcatFormNombre" type="text" class="input-text">
+
+      <div class="panel-actions">
+        <button id="btnGuardarSubcat" class="btn-primary">Guardar</button>
+        <button id="btnEliminarSubcat" class="btn-danger" style="display:none;">Eliminar</button>
+      </div>
+    </div>
+  </aside>
+
+
+  <!-- ===========================================================
+       PANEL PRODUCTO
+  ============================================================ -->
+  <aside id="panelProductoForm" class="side-panel" hidden>
+    <header>
+      <h2 id="panelProductoFormTitle">Nuevo producto</h2>
+      <button data-close-panel class="close-btn">×</button>
+    </header>
+
+    <div class="panel-body">
+
+      <label>Nombre</label>
+      <input id="prodFormNombre" type="text" class="input-text">
+
+      <input id="prodFormSku" type="hidden" value="">
+
+      <label>Subcategoría</label>
+      <select id="prodFormSubcat" class="input-text"></select>
+
+      <label>Precio</label>
+      <input id="prodFormPrecio" type="number" class="input-text" min="0" step="0.01">
+
+      <label>Descripción</label>
+      <textarea id="prodFormDescripcion" class="input-text"></textarea>
+
+      <label>Imagen (pendiente)</label>
+      <input id="prodFormImagen" type="file" class="input-text">
+
+      <div class="panel-actions">
+        <button id="btnGuardarProducto" class="btn-primary" style="width:100%;">Guardar producto</button>
+        <button id="btnGuardarProductoBorrador" class="btn-secondary" style="width:100%; margin-top:10px;">
+          Guardar como borrador
+        </button>
+        <button id="btnEliminarProducto" class="btn-danger" style="width:100%; margin-top:10px; display:none;">
+          Eliminar
+        </button>
+      </div>
+
+    </div>
+  </aside>
+
+
+  <!-- ===========================================================
+       PANEL MESAS
+  ============================================================ -->
+  <aside id="panelMesasForm" class="side-panel" hidden>
+    <header>
+      <h2>Configurar mesas</h2>
+      <button data-close-panel class="close-btn">×</button>
+    </header>
+
+    <div class="panel-body">
+
+      <label>Total de mesas</label>
+      <select id="mesasFormTotal" class="input-text">
+        <option value="0">0 mesas</option>
+        <option value="1">1 mesa</option>
+        <option value="2">2 mesas</option>
+        <option value="3">3 mesas</option>
+        <option value="4">4 mesas</option>
+        <option value="5">5 mesas</option>
+        <option value="6">6 mesas</option>
+        <option value="7">7 mesas</option>
+        <option value="8">8 mesas</option>
+        <option value="9">9 mesas</option>
+        <option value="10">10 mesas</option>
+        <option value="11">11 mesas</option>
+        <option value="12">12 mesas</option>
+        <option value="13">13 mesas</option>
+        <option value="14">14 mesas</option>
+        <option value="15">15 mesas</option>
+        <option value="16">16 mesas</option>
+        <option value="17">17 mesas</option>
+        <option value="18">18 mesas</option>
+        <option value="19">19 mesas</option>
+        <option value="20">20 mesas</option>
+      </select>
+
+      <div class="panel-actions">
+        <button id="btnGuardarMesas" class="btn-primary" style="width:100%;">Guardar</button>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- JS -->
+  <script type="module" src="/propietario/js/ventas/menu/main.js"></script>
+
+
+</body>
+</html>

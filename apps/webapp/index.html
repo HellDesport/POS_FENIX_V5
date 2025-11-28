@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Fénix | Inicio</title>
+  <link rel="stylesheet" href="./styles/base.css">
+</head>
+<body>
+  <main id="app" class="landing">
+    <section id="roleSelector">
+      <h1>Fénix POS</h1>
+      <p>Selecciona cómo deseas acceder:</p>
+
+      <div class="role-buttons">
+        <a class="btn" href="/propietario/auth/login/login.html">Acceso Propietario</a>
+        <a class="btn" href="/terminal/auth/login.html">Acceso Terminal</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // No autologin: solo aseguramos que el selector esté visible
+    document.getElementById("roleSelector").style.display = "block";
+  </script>
+</body>
+</html>

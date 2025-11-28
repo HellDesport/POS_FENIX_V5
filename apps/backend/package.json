@@ -1,0 +1,23 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "node ./src/app_propietario.js",
+    "dev": "nodemon --watch src --ext js,json ./src/app_propietario.js",
+    "start:propietario": "node ./src/app_propietario.js",
+    "dev:propietario": "nodemon --watch src --ext js,json ./src/app_propietario.js",
+    "start:terminal": "node ./src/app_terminal.js",
+    "dev:terminal": "nodemon --watch src --ext js,json ./src/app_terminal.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.15.2",
+    "pdfkit": "^0.17.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

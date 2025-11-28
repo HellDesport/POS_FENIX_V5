@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fénix | Recuperar contraseña</title>
+
+  <link rel="stylesheet" href="../../../styles/base.css" />
+  <link rel="stylesheet" href="../../../styles/auth.css" />
+  <link rel="icon" href="../../../assets/icons/logo.svg" type="image/svg+xml" />
+</head>
+<body>
+  <main class="auth-card">
+    <header class="auth-header">
+      <img src="../../../assets/icons/logo.svg" alt="Fénix" onerror="this.style.display='none'">
+      <h1>Recuperar contraseña</h1>
+      <p class="muted">Ingresa tu email para enviarte un enlace de recuperación.</p>
+    </header>
+
+    <form id="frmForgot" novalidate>
+      <label>Email
+        <input id="email" name="email" type="email" inputmode="email" placeholder="tu@oasis.mx" required />
+      </label>
+
+      <button id="btnSubmit" class="btn" type="submit">Enviar enlace</button>
+      <p id="msg" class="msg muted" role="status" aria-live="polite"></p>
+    </form>
+
+    <nav class="auth-links">
+      <a href="./login.html">Volver a iniciar sesión</a>
+    </nav>
+  </main>
+
+  <script type="module" src="./forgot.js"></script>
+  <script>window.addEventListener('DOMContentLoaded',()=>document.getElementById('email')?.focus());</script>
+</body>
+</html>

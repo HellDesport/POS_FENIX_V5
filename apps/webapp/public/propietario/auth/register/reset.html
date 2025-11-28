@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fénix | Restablecer contraseña</title>
+
+  <link rel="stylesheet" href="../../../styles/base.css" />
+  <link rel="stylesheet" href="../../../styles/auth.css" />
+  <link rel="icon" href="../../../assets/icons/logo.svg" type="image/svg+xml" />
+</head>
+<body>
+  <main class="auth-card">
+    <header class="auth-header">
+      <img src="../../../assets/icons/logo.svg" alt="Fénix" onerror="this.style.display='none'">
+      <h1>Restablecer contraseña</h1>
+      <p class="muted">Ingresa tu nueva contraseña. El enlace se valida con el token del correo.</p>
+    </header>
+
+    <form id="frmReset" novalidate>
+      <label>Nueva contraseña
+        <div class="pwd-wrap">
+          <input id="password" name="password" type="password" minlength="6" required />
+          <button id="togglePwd" type="button" class="link">Mostrar</button>
+        </div>
+      </label>
+
+      <label>Confirmar contraseña
+        <div class="pwd-wrap">
+          <input id="password2" name="password2" type="password" minlength="6" required />
+          <button id="togglePwd2" type="button" class="link">Mostrar</button>
+        </div>
+      </label>
+
+      <button id="btnSubmit" class="btn" type="submit">Guardar nueva contraseña</button>
+      <p id="msg" class="msg muted" role="status" aria-live="polite"></p>
+    </form>
+
+    <nav class="auth-links">
+      <a href="../login/login.html">Volver a iniciar sesión</a>
+    </nav>
+  </main>
+
+  <script type="module" src="./reset.js"></script>
+</body>
+</html>

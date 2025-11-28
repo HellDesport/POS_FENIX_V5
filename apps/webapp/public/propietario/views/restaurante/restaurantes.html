@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fénix | Datos del Restaurante</title>
+
+  <!-- estilos (base primero, luego página específica) -->
+  <link rel="stylesheet" href="../../../styles/base.css" />
+  <link rel="stylesheet" href="../../../styles/restaurante.css" />
+
+  <link rel="icon" href="../../../assets/icons/logo.svg" type="image/svg+xml" />
+</head>
+<body>
+  <div class="layout layout--single">
+    <!-- Main -->
+    <main class="main">
+      <header class="mainbar">
+        <h2>Datos del Restaurante</h2>
+        <!-- Botón para volver al dashboard del propietario -->
+        <a href="../home/dashboard.html" class="btn outline">
+          Volver al panel
+        </a>
+      </header>
+
+      <section class="cards">
+        <!-- Panel estado + resumen -->
+        <article class="card" id="rest_estado_panel">
+          <h3>Estado de configuración</h3>
+          <p class="muted" id="rest_msg">
+            Cargando información del restaurante…
+          </p>
+
+          <div class="card-actions" id="rest_actions">
+            <!-- Cuando no exista restaurante, este botón se muestra.
+                 Cuando ya exista, el JS puede ocultarlo. -->
+            <button type="button" class="btn" id="btnCrearRestaurante">
+              Crear restaurante
+            </button>
+          </div>
+
+          <p class="muted" style="margin-top:.5rem;">
+            Actualmente solo se permite <b>un restaurante por propietario</b>.  
+            Puedes editar los datos de este restaurante, pero no crear más sucursales desde este panel.
+          </p>
+
+          <!-- Tarjeta visual del restaurante (se muestra después de crear) -->
+          <section class="rest-summary" id="rest_resumen" hidden>
+            <div class="rest-summary-shell">
+              <!-- Botón de opciones (3 puntitos) -->
+              <button
+                type="button"
+                class="rest-summary-menu-btn"
+                id="rest_menu_btn"
+                aria-label="Opciones del restaurante"
+              >
+                ⋮
+              </button>
+
+              <!-- Menú desplegable -->
+              <div class="rest-summary-menu" id="rest_menu" hidden>
+                <button
+                  type="button"
+                  class="rest-summary-menu-item"
+                  id="rest_btn_eliminar"
+                  data-action="delete"
+                >
+                  Eliminar restaurante
+                </button>
+              </div>
+
+              <!-- Tarjeta clickable para ir al formulario -->
+              <button type="button" class="rest-summary-card" id="rest_summary_btn">
+                <div class="rest-summary-logo">
+                  <span>LOGO</span>
+                </div>
+                <div class="rest-summary-name" id="rest_resumen_nombre">
+                  Nuevo restaurante
+                </div>
+              </button>
+            </div>
+          </section>
+
+          <!-- Modal de confirmación para eliminar restaurante -->
+          <div class="rest-confirm" id="rest_confirm" hidden>
+            <div class="rest-confirm-dialog">
+              <h4>Eliminar restaurante</h4>
+              <p>
+                ¿Seguro que deseas eliminar este restaurante?
+                Esta acción no se puede deshacer.
+              </p>
+              <div class="rest-confirm-actions">
+                <button type="button" class="btn outline" id="rest_confirm_cancel">
+                  Cancelar
+                </button>
+                <button type="button" class="btn danger" id="rest_confirm_ok">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Formulario principal -->
+        <article class="card" id="rest_form_card">
+          <!-- Bloqueo borroso cuando no haya restaurante seleccionado -->
+          <div class="form-lock" id="rest_form_lock" hidden>
+            <div class="form-lock-inner">
+              Selecciona o crea un restaurante para poder editar su información.
+            </div>
+          </div>
+
+          <h3>Información general</h3>
+
+          <form id="restauranteForm">
+            <!-- DATOS GENERALES -->
+            <section class="form-section">
+              <h4>Datos del restaurante</h4>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="rest_nombre">Nombre comercial</label>
+                  <input type="text" id="rest_nombre" name="nombre" required maxlength="140">
+                </div>
+
+                <div class="field">
+                  <label for="rest_estatus">Estatus</label>
+                  <select id="rest_estatus" name="estatus">
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                    <option value="suspendido">Suspendido</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="rest_max_sesiones">Sesiones simultáneas</label>
+                  <input type="number" id="rest_max_sesiones" name="max_sesiones" min="1" max="9">
+                </div>
+
+                <div class="field">
+                  <label for="rest_total_mesas">Total de mesas</label>
+                  <input
+                    type="number"
+                    id="rest_total_mesas"
+                    name="total_mesas"
+                    min="0"
+                    readonly
+                    title="Se ajusta en menú de restaurante"
+                  >
+                  <small class="muted">Se sincroniza con el módulo de mesas.</small>
+                </div>
+
+                <div class="field field-full">
+                  <label for="rest_timezone">Zona horaria</label>
+                  <input type="text" id="rest_timezone" name="timezone" placeholder="America/Mexico_City">
+                </div>
+              </div>
+            </section>
+
+            <!-- DIRECCIÓN -->
+            <section class="form-section">
+              <h4>Dirección</h4>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="rest_calle">Calle</label>
+                  <input type="text" id="rest_calle" name="calle" maxlength="160">
+                </div>
+
+                <div class="field">
+                  <label for="rest_num_ext">Número exterior</label>
+                  <input type="text" id="rest_num_ext" name="numero_ext" maxlength="16">
+                </div>
+
+                <div class="field">
+                  <label for="rest_num_int">Número interior</label>
+                  <input type="text" id="rest_num_int" name="numero_int" maxlength="16">
+                </div>
+
+                <div class="field">
+                  <label for="rest_colonia">Colonia</label>
+                  <input type="text" id="rest_colonia" name="colonia" maxlength="100">
+                </div>
+
+                <div class="field">
+                  <label for="rest_municipio">Municipio / Ciudad</label>
+                  <input type="text" id="rest_municipio" name="municipio" maxlength="100">
+                </div>
+
+                <div class="field">
+                  <label for="rest_estado">Estado</label>
+                  <input type="text" id="rest_estado" name="estado" maxlength="100">
+                </div>
+
+                <div class="field">
+                  <label for="rest_pais">País</label>
+                  <input type="text" id="rest_pais" name="pais" maxlength="60" value="México">
+                </div>
+
+                <div class="field">
+                  <label for="rest_cp">Código postal</label>
+                  <input type="text" id="rest_cp" name="codigo_postal" maxlength="10">
+                </div>
+
+                <div class="field field-full">
+                  <label for="rest_referencia">Referencias de ubicación</label>
+                  <textarea id="rest_referencia" name="referencia" rows="2"></textarea>
+                </div>
+              </div>
+            </section>
+
+            <!-- CONFIGURACIÓN FISCAL / FOLIOS -->
+            <section class="form-section">
+              <h4>Impuestos y folios</h4>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="cfg_impuesto_modo">Modo de impuesto</label>
+                  <select id="cfg_impuesto_modo" name="impuesto_modo">
+                    <option value="INCLUIDO">INCLUIDO</option>
+                    <option value="DESGLOSADO">DESGLOSADO</option>
+                    <option value="EXENTO">EXENTO</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="cfg_impuesto_tasa">Tasa de impuesto (%)</label>
+                  <input type="number" id="cfg_impuesto_tasa" name="impuesto_tasa" step="0.01" min="0" max="100">
+                </div>
+
+                <div class="field field-checkbox">
+                  <label>
+                    <input type="checkbox" id="cfg_mostrar_desglose" name="mostrar_desglose_iva_en_ticket">
+                    Mostrar desglose de IVA en ticket
+                  </label>
+                </div>
+
+                <div class="field">
+                  <label for="cfg_serie_folio">Serie de folio</label>
+                  <input type="text" id="cfg_serie_folio" name="serie_folio" maxlength="10">
+                </div>
+
+                <div class="field">
+                  <label for="cfg_folio_actual">Folio actual</label>
+                  <input type="number" id="cfg_folio_actual" name="folio_actual" min="1">
+                </div>
+
+                <div class="field field-checkbox">
+                  <label>
+                    <input type="checkbox" id="cfg_folio_habilitado" name="folio_habilitado">
+                    Habilitar folios
+                  </label>
+                </div>
+
+                <div class="field">
+                  <label for="cfg_moneda">Moneda</label>
+                  <input type="text" id="cfg_moneda" name="moneda" maxlength="8" value="MXN">
+                </div>
+
+                <div class="field">
+                  <label for="cfg_config_status">Estado de configuración</label>
+                  <input type="text" id="cfg_config_status" name="config_status" readonly>
+                </div>
+              </div>
+            </section>
+
+            <!-- IMPRESORAS (resumen desde config, el detalle estará en módulo impresoras) -->
+            <section class="form-section">
+              <h4>Impresoras (resumen)</h4>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="cfg_impresora_terminal">Impresora de terminal</label>
+                  <input type="text" id="cfg_impresora_terminal" name="impresora_terminal" maxlength="120">
+                </div>
+
+                <div class="field">
+                  <label for="cfg_impresora_cocina">Impresora de cocina</label>
+                  <input type="text" id="cfg_impresora_cocina" name="impresora_cocina" maxlength="120">
+                </div>
+              </div>
+              <p class="muted" style="margin-top:.4rem;">
+                La configuración detallada de impresoras se gestiona en el módulo
+                <b>Dispositivos e impresoras</b>. Aquí solo se muestra el resumen asociado al restaurante.
+              </p>
+            </section>
+
+            <!-- Botón de guardado global -->
+            <footer class="form-actions">
+              <button type="submit" class="btn" id="btnGuardarRestaurante">
+                Guardar cambios
+              </button>
+            </footer>
+          </form>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <!-- lógica para cargar/guardar restaurante -->
+  <script type="module" src="../../js/restaurante/restaurante.js"></script>
+</body>
+</html>

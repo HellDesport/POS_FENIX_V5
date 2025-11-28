@@ -1,0 +1,20 @@
+# Backend
+apps/backend/node_modules/
+apps/backend/uploads/
+apps/backend/.env
+apps/backend/*.pid
+
+# Frontend
+apps/webapp/node_modules/
+
+# Print Service (C#)
+apps/print-service/**/bin/
+apps/print-service/**/obj/
+
+# Globals
+node_modules/
+.env
+*.log
+*.zip
+*.rar
+.DS_Store

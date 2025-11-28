@@ -1,0 +1,418 @@
+/* ===========================================================
+   VARIABLES
+=========================================================== */
+:root {
+  --bg-main: #04040a;
+  --bg-card: #0d0f16;
+  --bg-panel: rgba(15,15,25,.5);
+  --bg-soft: rgba(255,255,255,.05);
+
+  --text: #f6f7fb;
+  --muted: #9fa3b8;
+
+  --accent: #2563eb;
+  --accent-soft: rgba(37, 99, 235, .20);
+  --border: rgba(255,255,255,.07);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+
+  --shadow-sm: 0 4px 14px rgba(0,0,0,.25);
+  --shadow-md: 0 8px 22px rgba(0,0,0,.35);
+}
+
+/* ===========================================================
+   RESET
+=========================================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: radial-gradient(circle at top, #151521 0%, #06070c 60%);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* ===========================================================
+   HEADER
+=========================================================== */
+.menu-header {
+  padding: 28px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+
+.menu-header h1 {
+  font-size: 1.7rem;
+  margin-bottom: 4px;
+}
+
+.rest-nombre {
+  background: rgba(255,255,255,.06);
+  padding: 3px 10px;
+  border-radius: 8px;
+  margin-left: 8px;
+  font-size: .78rem;
+}
+
+.mh-desc {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: .88rem;
+}
+
+.mh-badges {
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+}
+
+.mh-badge {
+  padding: 6px 14px;
+  background: rgba(255,255,255,.05);
+  border-radius: 20px;
+  font-size: .75rem;
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.mh-clickable {
+  cursor: pointer;
+  transition: .25s;
+}
+
+.mh-clickable:hover {
+  background: rgba(255,255,255,.12);
+}
+
+.mh-back {
+  padding: 10px 16px;
+  border-radius: 20px;
+  border: 1px dashed rgba(255,255,255,.15);
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.mh-back:hover {
+  background: rgba(255,255,255,.07);
+  color: white;
+}
+
+/* ===========================================================
+   LAYOUT PRINCIPAL
+=========================================================== */
+.menu-layout {
+  display: grid;
+  grid-template-columns: 280px 320px 1fr;
+  min-height: calc(100vh - 120px);
+  height: auto;
+  overflow: visible;
+  position: relative;
+}
+/* ===========================================================
+   PANELS
+=========================================================== */
+.panel {
+  padding: 16px 20px;
+  border-right: 1px solid rgba(255,255,255,.05);
+  background: rgba(10,10,16,.28);
+  backdrop-filter: blur(8px);
+  overflow-y: auto;
+}
+
+/* ===========================================================
+   HEADERS DE PANEL
+=========================================================== */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.panel-header h2 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ===========================================================
+   INPUTS
+=========================================================== */
+.input-search,
+.input-text,
+textarea.input-text,
+select.input-text {
+  width: 100%;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  margin-bottom: 10px;
+  font-size: .86rem;
+  color: var(--text);
+}
+
+textarea.input-text {
+  min-height: 70px;
+}
+
+/* ===========================================================
+   BOTÓN +
+=========================================================== */
+.btn-accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.btn-accent:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* ===========================================================
+   LISTAS: CATEGORÍAS + SUBCATEGORÍAS
+=========================================================== */
+.fancy-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fancy-list > li {
+  margin-bottom: 6px;
+}
+
+.fancy-list > li:last-child {
+  margin-bottom: 0;
+}
+
+.categoria-item,
+.subcategoria-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  min-height: 48px;
+  transition: .25s;
+  box-shadow: var(--shadow-sm);
+}
+
+.categoria-item:hover,
+.subcategoria-item:hover {
+  background: rgba(255,255,255,.06);
+}
+
+.categoria-item.active,
+.subcategoria-item.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* columna izquierda */
+.category-main,
+.subcat-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.category-name,
+.subcat-name {
+  font-size: .9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-meta,
+.subcat-meta {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+/* columna derecha */
+.category-actions,
+.subcat-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  font-size: .85rem;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: .2s;
+}
+
+.btn-icon:hover {
+  background: rgba(255,255,255,.08);
+  color: white;
+}
+
+/* ===========================================================
+   PRODUCTOS
+=========================================================== */
+.products-list {
+  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.product-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 12px;
+  cursor: pointer;
+  transition: .25s;
+  box-shadow: var(--shadow-sm);
+}
+
+.product-card:hover {
+  background: rgba(255,255,255,.06);
+}
+
+.product-thumb {
+  width: 60px;
+  height: 60px;
+  background: rgba(255,255,255,.06);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-image-placeholder {
+  width: 60px;
+  height: 60px;
+  background: rgba(255,255,255,.08);
+  border-radius: 6px;
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-name {
+  font-size: .92rem;
+  font-weight: 600;
+}
+
+.product-subinfo {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+.product-price {
+  font-size: .88rem;
+  font-weight: 600;
+  color: #4ade80;
+}
+
+/* ===========================================================
+   TABS
+=========================================================== */
+.products-header-tabs {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
+.tab {
+  padding: 6px 12px;
+  background: rgba(255,255,255,.06);
+  border-radius: 8px;
+  font-size: .8rem;
+  color: var(--muted);
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,.09);
+  transition: .2s;
+}
+
+.tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* ===========================================================
+   EMPTY STATES
+=========================================================== */
+.empty-info {
+  color: var(--muted);
+  font-size: .85rem;
+  margin-top: 6px;
+}
+
+/* ===========================================================
+   OVERLAY + SIDE PANELS — CORREGIDO (NO BLOQUEA CLICS)
+=========================================================== */
+.side-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(3px);
+  z-index: 90;
+}
+
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100%;
+  background: #0f1118;
+  padding: 22px;
+  overflow-y: auto;
+  box-shadow: -8px 0 20px rgba(0,0,0,.4);
+  z-index: 100;
+  animation: slide .25s ease;
+}
+
+.side-overlay[hidden],
+.side-panel[hidden] {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+@keyframes slide {
+  from { right: -380px; }
+  to   { right: 0; }
+}
