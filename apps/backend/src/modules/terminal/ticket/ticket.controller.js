@@ -1,41 +1,56 @@
 // apps/backend/src/modules/terminal/ticket/ticket.controller.js
+
 import * as service from "./ticket.service.js";
 
-export async function generar(req, res) {
+/* =========================================================
+   GET /:ticketId
+   Obtiene el ticket completo:
+     - Si NO tiene contenido_json -> lo genera
+     - Devuelve contenido_json + datos base del ticket
+   ========================================================= */
+export async function obtenerTicket(req, res, next) {
   try {
-    const { restauranteId, ordenId, usuarioId, tipo = "VENTA" } = req.body || {};
-    const result = await service.generar(restauranteId, ordenId, usuarioId, tipo);
-    res.json({ ok: true, ...result });
+    const ticketId = Number(req.params.ticketId);
+    const data = await service.obtenerTicketCompleto(ticketId);
+    res.json({ ok: true, ticket: data });
   } catch (err) {
-    res.status(500).json({ ok: false, message: err.message });
+    next(err);
   }
 }
 
-export async function reimprimir(req, res) {
+/* =========================================================
+   POST /:ticketId/rebuild
+   Fuerza la regeneración del contenido_json usando builder
+   ========================================================= */
+export async function reconstruirTicket(req, res, next) {
   try {
-    const { restauranteId, ticketId, usuarioId } = req.body || {};
-    await service.reimprimir(restauranteId, ticketId, usuarioId);
-    res.json({ ok: true });
+    const ticketId = Number(req.params.ticketId);
+    const contenido = await service.generarYGuardarContenido(ticketId);
+    res.json({
+      ok: true,
+      message: "contenido_json regenerado correctamente",
+      contenido,
+    });
   } catch (err) {
-    res.status(500).json({ ok: false, message: err.message });
+    next(err);
   }
 }
 
-export async function reimprimirUltimo(req, res) {
+/* =========================================================
+   POST /:ticketId/imprimir
+   Envía el ticket al microservicio ESC/POS
+   ========================================================= */
+export async function imprimirTicket(req, res, next) {
   try {
-    const { restauranteId, ordenId, tipo = "VENTA", usuarioId } = req.body || {};
-    await service.reimprimirUltimoPorTipo(restauranteId, ordenId, tipo, usuarioId);
-    res.json({ ok: true });
-  } catch (err) {
-    res.status(500).json({ ok: false, message: err.message });
-  }
-}
+    const ticketId = Number(req.params.ticketId);
+    const resultado = await service.enviarImpresion(ticketId);
 
-export async function listarImpresoras(req, res) {
-  try {
-    const list = await service.listarImpresoras();
-    res.json({ ok: true, ...list });
+    res.json({
+      ok: true,
+      message: "Ticket enviado a impresora",
+      resultado,
+    });
   } catch (err) {
-    res.status(500).json({ ok: false, message: err.message });
+    next(err);
   }
 }

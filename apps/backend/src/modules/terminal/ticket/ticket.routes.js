@@ -1,35 +1,56 @@
-import express from "express";
-import * as ctrl from "./ticket.controller.js";
-import * as svc from "./ticket.service.js";
-import { requireTerminalAuth } from "../middleware/auth.middleware.js";
+// apps/backend/src/modules/terminal/ticket/ticket.routes.js
 
-const router = express.Router();
-router.use(requireTerminalAuth);
+import { Router } from "express";
+import { requireTerminalAuth as requireAuth } from "../middleware/auth.middleware.js";
 
-/* ===================== TICKETS (ROL TERMINAL) ===================== */
-// POST /api/terminal/ticket/generar
-router.post("/generar", ctrl.generar);
+import {
+  obtenerTicket,
+  reconstruirTicket,
+  imprimirTicket,
+} from "./ticket.controller.js";
 
-// POST /api/terminal/ticket/reimprimir
-router.post("/reimprimir", ctrl.reimprimir);
+import { pingMicroservicio } from "./printer.client.js";
 
-// POST /api/terminal/ticket/reimprimir-ultimo
-router.post("/reimprimir-ultimo", ctrl.reimprimirUltimo);
+const router = Router({ mergeParams: true });
 
-// GET /api/terminal/ticket/impresoras
-router.get("/impresoras", ctrl.listarImpresoras);
-
-// (opcional) ping rápido para comprobar montaje
-router.get("/_ping", (req, res) => res.json({ ok: true, scope: "ticket" }));
-
-
-router.post("/test", async (req, res, next) => {
+/* =========================================================
+   PING — SIN AUTH
+   ========================================================= */
+router.get("/_ping", async (req, res) => {
   try {
-    const { restauranteId, ordenId, usuarioId, tipo = "VENTA" } = req.body;
-    const result = await svc.generar(restauranteId, ordenId, usuarioId, tipo);
-    res.json({ ok: true, message: "Ticket generado correctamente", result });
-  } catch (e) {
-    next(e);
+    const ping = await pingMicroservicio();
+    res.json({
+      ok: true,
+      backend: "online",
+      printer: {
+        online: ping.ok,
+        endpoint: ping.endpoint,
+        message: ping.message || null,
+      },
+    });
+  } catch (err) {
+    res.json({
+      ok: true,
+      backend: "online",
+      printer: {
+        online: false,
+        error: err.message,
+      },
+    });
   }
 });
+
+/* =========================================================
+   A PARTIR DE AQUÍ → REQUIERE TOKEN
+   ========================================================= */
+router.use(requireAuth);
+
+/* =========================================================
+   RUTAS PRINCIPALES
+   ========================================================= */
+
+router.get("/:ticketId", obtenerTicket);
+router.post("/:ticketId/rebuild", reconstruirTicket);
+router.post("/:ticketId/imprimir", imprimirTicket);
+
 export default router;

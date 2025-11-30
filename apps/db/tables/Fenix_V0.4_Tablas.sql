@@ -193,7 +193,8 @@ CREATE TABLE categoria_producto (
 CREATE TABLE producto (
   id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   restaurante_id BIGINT UNSIGNED NOT NULL,
-  categoria_id   BIGINT UNSIGNED NULL,
+  categoria_id   BIGINT UNSIGNED NULL,    -- NOTA: categoria_id SIEMPRE debe hacer referencia a una subcategoría (hoja), 
+										                      -- no a categorías padre. Validado en triggers y servicio.
   nombre         VARCHAR(200) NOT NULL,
   slug           VARCHAR(160) NOT NULL,
   descripcion    VARCHAR(255),
@@ -363,20 +364,29 @@ CREATE TABLE ticket (
   orden_id           BIGINT UNSIGNED NOT NULL,
   restaurante_id     BIGINT UNSIGNED NOT NULL,
   tipo               ENUM('VENTA','REIMPRESION','COCINA','CANCELACION') NOT NULL DEFAULT 'VENTA',
-  contenido_qr       VARCHAR(255),       -- hash/enlace del ticket (para reimpresión)
+  contenido_qr       VARCHAR(255) DEFAULT NULL,
+  contenido_json     JSON DEFAULT NULL,
   copias_generadas   SMALLINT UNSIGNED DEFAULT 0,
-  impresora_nombre   VARCHAR(120),       -- nombre lógico usado
-  impresora_endpoint VARCHAR(200),       -- p.ej. http://localhost:9100 (microservicio)
-  generado_por       BIGINT UNSIGNED NULL,  -- FK a usuario (opcional)
+  impresora_nombre   VARCHAR(120) DEFAULT NULL,
+  impresora_endpoint VARCHAR(200) DEFAULT NULL,
+  generado_por       BIGINT UNSIGNED DEFAULT NULL,
   generado_en        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
   PRIMARY KEY (id),
   KEY ix_ticket_orden (orden_id),
   KEY ix_ticket_rest_tipo_fecha (restaurante_id, tipo, generado_en),
   KEY ix_ticket_impresora_fecha (impresora_nombre, generado_en),
+
   CONSTRAINT fk_ticket_orden FOREIGN KEY (orden_id)
-    REFERENCES orden(id) ON DELETE CASCADE,
+      REFERENCES orden(id) ON DELETE CASCADE,
+
   CONSTRAINT fk_ticket_rest FOREIGN KEY (restaurante_id)
-    REFERENCES restaurante(id) ON DELETE CASCADE,
+      REFERENCES restaurante(id) ON DELETE CASCADE,
+
   CONSTRAINT fk_ticket_usuario FOREIGN KEY (generado_por)
-    REFERENCES usuario(id) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+      REFERENCES usuario(id)
+      ON DELETE SET NULL ON UPDATE CASCADE
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_0900_ai_ci;

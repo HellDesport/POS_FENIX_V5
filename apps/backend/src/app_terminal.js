@@ -17,6 +17,18 @@ import { env } from "./config/env.js";
 import { assertDb } from "./config/db.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 
+// ============================================================
+// LOGGER FÉNIX
+// ============================================================
+const Log = {
+  init:  (msg) => console.log(`\x1b[35m[FÉNIX::INIT]\x1b[0m ${msg}`),
+  info:  (msg) => console.log(`\x1b[36m[FÉNIX::INFO]\x1b[0m ${msg}`),
+  warn:  (msg) => console.log(`\x1b[33m[FÉNIX::WARN]\x1b[0m ${msg}`),
+  error: (msg) => console.log(`\x1b[31m[FÉNIX::ERROR]\x1b[0m ${msg}`),
+  ok:    (msg) => console.log(`\x1b[32m[FÉNIX::OK]\x1b[0m ${msg}`),
+  shutdown: (msg) => console.log(`\x1b[90m[FÉNIX::SHUTDOWN]\x1b[0m ${msg}`)
+};
+
 // === Directorios base robustos (independiente del cwd) ===
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);          // .../apps/backend/src
@@ -25,7 +37,9 @@ const BASE_DIR = path.resolve(__dirname, "..");      // .../apps/backend
 // === RUTAS DEL ROL TERMINAL ===
 import terminalAuthRoutes from "./modules/terminal/auth/auth.routes.js";
 import terminalRoutes from "./modules/terminal/terminal.routes.js";
+import productosRoutes from "./modules/terminal/productos/productos.routes.js";
 import printerRoutes from "./printer/printer.routes.js";
+import ticketRoutes from "./modules/terminal/ticket/ticket.routes.js";
 
 const app = express();
 app.use(express.json());
@@ -63,13 +77,16 @@ app.get("/health", (_req, res) =>
   res.json({ ok: true, role: "terminal", status: "online" })
 );
 await assertDb();
+Log.ok("Base de datos conectada correctamente.");
 
 // ============================================================
 // RUTAS DEL ROL TERMINAL
 // ============================================================
 app.use("/api/terminal/auth", terminalAuthRoutes);
 app.use("/api/terminal", terminalRoutes);
+app.use("/api/terminal/productos", productosRoutes);
 app.use("/api/printer", printerRoutes);
+app.use("/api/terminal/ticket", ticketRoutes);
 
 // ============================================================
 // MANEJO DE ERRORES Y 404
@@ -87,7 +104,7 @@ const PID_FILE = path.resolve(BASE_DIR, ".fenix-terminal.pid");
 
 function banner(msg) {
   const line = "─".repeat(msg.length + 2);
-  console.log(`\n┌${line}┐\n│ ${msg} │\n└${line}┘\n`);
+  console.log(`\n\x1b[35m┌${line}┐\n│ ${msg} │\n└${line}┘\x1b[0m\n`);
 }
 
 function anotherInstanceRunning() {
@@ -121,10 +138,11 @@ function findDotnetPath() {
     "C:\\Program Files\\dotnet\\dotnet.exe",
     "C:\\Program Files (x86)\\dotnet\\dotnet.exe",
     path.join(process.env.LOCALAPPDATA || "", "Microsoft\\dotnet\\dotnet.exe"),
-    process.env.DOTNET_PATH, // opcional por .env
+    process.env.DOTNET_PATH,
   ].filter(Boolean);
+
   const found = possible.find(p => fs.existsSync(p));
-  return found || "dotnet"; // último intento: del PATH
+  return found || "dotnet";
 }
 
 function resolvePrinterServicePath() {
@@ -132,7 +150,7 @@ function resolvePrinterServicePath() {
     process.env.PRINTER_SERVICE_PATH
       ? path.resolve(BASE_DIR, process.env.PRINTER_SERVICE_PATH)
       : null,
-    path.resolve(BASE_DIR, "../print-service/Fenix.PrintService"), // ✅ ruta real
+    path.resolve(BASE_DIR, "../Fenix.PrinterService"),
   ].filter(Boolean);
 
   for (const p of candidates) {
@@ -146,32 +164,35 @@ function resolvePrinterServicePath() {
 }
 
 async function ensurePrinterService() {
-  const url = process.env.PRINTER_SERVICE_URL || "http://localhost:9100";
+  let url = process.env.PRINTER_SERVICE_URL?.trim() || "http://localhost:5000";
 
-  // ¿ya está arriba?
   try {
-    const res = await fetch(`${url}/status`);
+    const res = await fetch(`${url}/status`, { method: "GET" });
     if (res.ok) {
-      console.log("🖨️ Printer Service ya está en ejecución ✅");
+      Log.ok(`Printer Service activo en ${url}`);
       return;
     }
   } catch {
-    console.log("⚠️ Printer Service no responde. Intentando iniciar...");
+    Log.warn("Printer Service no responde — intentando iniciar...");
   }
 
-  // Resolver rutas
   const servicePath = resolvePrinterServicePath();
   if (!servicePath) {
-    console.error("❌ No pude ubicar 'printer-service'. Define PRINTER_SERVICE_PATH o revisa la estructura.");
+    Log.error("No pude ubicar PrinterService. Revisa PRINTER_SERVICE_PATH.");
     return;
   }
 
+  Log.init(`Ruta detectada: ${servicePath}`);
+
   const dotnet = findDotnetPath();
-  if (dotnet !== "dotnet") console.log(`ℹ️ dotnet detectado en: ${dotnet}`);
-  console.log(`ℹ️ CWD del printer-service: ${servicePath}`);
+  if (!dotnet) {
+    Log.error("dotnet.exe no encontrado.");
+    return;
+  }
+
+  Log.init(`dotnet encontrado en: ${dotnet}`);
 
   try {
-    // Sin shell, con cwd válido. Evita ENOENT por rutas con espacios y cwd inexistente.
     printerProc = spawn(dotnet, ["run"], {
       cwd: servicePath,
       stdio: "inherit",
@@ -179,31 +200,31 @@ async function ensurePrinterService() {
     });
 
     printerProc.on("error", (err) => {
-      console.error("❌ Error al lanzar Printer Service:", err.message);
+      Log.error(`Error al lanzar Printer Service: ${err.message}`);
     });
 
     printerProc.on("exit", (code) => {
-      console.log(`⚠️ Printer Service finalizó con código ${code}`);
+      Log.warn(`Printer Service finalizó (código ${code})`);
     });
 
-    console.log("🟢 Printer Service iniciado desde Terminal POS.");
+    Log.ok("Printer Service iniciado correctamente.");
   } catch (err) {
-    console.error("❌ No se pudo iniciar Printer Service:", err.message);
+    Log.error(`No se pudo iniciar Printer Service: ${err.message}`);
   }
 }
 
 function stopPrinterService() {
   if (printerProc && !printerProc.killed) {
     try {
-      console.log("🧩 Cerrando Printer Service...");
+      Log.shutdown("Cerrando Printer Service…");
       printerProc.kill("SIGINT");
     } catch (err) {
-      console.warn("⚠️ No se pudo detener Printer Service:", err.message);
+      Log.warn(`No se pudo detener Printer Service: ${err.message}`);
     }
   }
 }
 
-// Vincular eventos de salida para cierre limpio
+// Eventos de salida
 process.on("exit", () => {
   removePidFile();
   stopPrinterService();
@@ -235,31 +256,30 @@ async function isAlreadyUp(port) {
 
 async function startServer(port, attempts = 0) {
   if (anotherInstanceRunning()) {
-    banner(`Terminal POS YA está corriendo (pid en ${PID_FILE}). Evitando duplicado.`);
+    banner(`Terminal POS YA está corriendo (pid en ${PID_FILE}).`);
     process.exit(0);
   }
 
   if (await isAlreadyUp(port)) {
-    banner(`Terminal POS ya activo en http://localhost:${port} ✅`);
-    console.log(`(Windows) netstat -ano | findstr :${port} → taskkill /PID <PID> /F`);
+    banner(`Terminal POS ya activo en http://localhost:${port}`);
     process.exit(0);
   }
 
-  // Aseguramos que el microservicio de impresión esté activo
   await ensurePrinterService();
 
   const server = app.listen(port, () => {
     writePidFile();
-    banner(`Terminal POS corriendo en http://localhost:${port} 🚀`);
-    console.log(`Node ${process.version} • ${os.platform()} ${os.release()}`);
+    banner(`Terminal POS corriendo en http://localhost:${port}`);
+    Log.info(`Node ${process.version} • ${os.platform()} ${os.release()}`);
   });
 
   server.on("error", (err) => {
     if (err.code === "EADDRINUSE" && attempts < 5) {
-      console.warn(`Puerto ${port} ocupado; probando ${port + 1}...`);
+      Log.warn(`Puerto ${port} ocupado — reintentando en ${port + 1}`);
       setTimeout(() => startServer(port + 1, attempts + 1), 400);
     } else {
-      console.error("No pude iniciar el servidor Terminal:", err);
+      Log.error("No pude iniciar el servidor Terminal:");
+      console.error(err);
       process.exit(1);
     }
   });
