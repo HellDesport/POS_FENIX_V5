@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Punto de Venta - Restaurante</title>
+  <link rel="stylesheet" href="STYLEPOSV1.css" />
+</head>
+
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-circle">FX</div>
+      <div class="logo-text">
+        <span class="logo-title">RESTAURANTE OASIS</span>
+        <span class="logo-subtitle">POS FENIX</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="#" class="nav-item active"><span class="nav-dot"></span>Platillos</a>
+        <a href="#" class="nav-item"><span class="nav-dot"></span>Mesas</a>
+        <a href="#" class="nav-item"><span class="nav-dot"></span>Pedidos</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item small"><span class="nav-dot"></span>Configuración</a>
+      <a href="#" class="nav-item small danger"><span class="nav-dot"></span>Cerrar sesión</a>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="search-wrapper">
+        <input type="text" placeholder="Buscar menú, pedidos, mesas y más" class="search-input" />
+      </div>
+
+      <div class="user-info">
+        <div class="user-text">
+          <span class="user-name">Leonardo</span>
+          <span class="user-role">Mesero X</span>
+        </div>
+        <div class="user-avatar">LE</div>
+      </div>
+    </header>
+
+    <div class="content-wrapper">
+
+      <!-- COLUMNA PRINCIPAL (Platillos) -->
+      <section class="center-column">
+
+        <!-- MENÚ -->
+        <section class="card menu-section">
+          <div class="section-header">
+            <h2>Menú</h2>
+
+            <div class="chip-group" data-chip-group="menu-category">
+                <button class="chip active" data-category="all">Todo</button>
+                <button class="chip" data-category="tacos">Tacos</button>
+                <button class="chip" data-category="hamburguesas">Hamburguesas</button>
+                <button class="chip" data-category="antojitos">Antojitos</button>
+                <button class="chip" data-category="bebidas">Bebidas</button>
+            </div>
+          </div>
+
+          <!-- AQUÍ EL BACKEND CARGARÁ LOS PRODUCTOS -->
+          <div class="menu-grid"></div>
+
+        </section>
+      </section>
+
+      <!-- SECCIÓN MESAS -->
+      <section class="mesas-section card" style="display:none;">
+        <div class="mesas-header">
+          <h2>Mapa de Mesas</h2>
+
+          <div class="legend">
+            <span class="legend-item"><span class="circle verde"></span>Libre</span>
+            <span class="legend-item"><span class="circle rojo"></span>Ocupada</span>
+            <span class="legend-item"><span class="circle amarillo"></span>Reservada</span>
+          </div>
+        </div>
+
+        <div class="grid-mesas" id="gridMesas"></div>
+      </section>
+
+      <!-- SECCIÓN PEDIDOS -->
+      <section class="pedidos-section card" style="display:none;">
+        <div class="section-header">
+          <h2>Pedidos</h2>
+
+          <div class="chip-group" data-chip-group="pedidos-filter">
+            <button class="chip active" data-status="all">Todos</button>
+            <button class="chip" data-status="waitlist">En espera</button>
+            <button class="chip" data-status="ready">Listos</button>
+            <button class="chip" data-status="served">Servidos</button>
+          </div>
+        </div>
+
+        <div class="pedidos-grid" id="pedidosGrid"></div>
+      </section>
+
+      <!-- COLUMNA DERECHA -->
+      <aside class="right-column card">
+        <div class="order-summary-header" id="ticketHeader" style="opacity:0;">
+          <div>
+            <div class="table-label" id="ticketMesa">Mesa —</div>
+            <div class="order-code" id="ticketCodigo">Pedido #—</div>
+          </div>
+          <div class="people-count">
+            <span id="ticketPersonas">0</span>
+            <span>Personas</span>
+          </div>
+        </div>
+
+        <div class="ordered-items">
+          <h3>Platillos pedidos</h3>
+          <ul id="orderItemsList"></ul>
+        </div>
+
+        <div class="payment-summary">
+          <h3>Resumen de pago</h3>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="subtotalTicket">$0</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total a pagar</span>
+            <span id="totalTicket">$0</span>
+          </div>
+        </div>
+
+        <div class="payment-method">
+          <h3>Método de pago</h3>
+          <div class="chip-group" data-chip-group="payment">
+            <button class="chip active" data-method="cash">Efectivo</button>
+            <button class="chip" data-method="card">Tarjeta</button>
+          </div>
+        </div>
+
+        <div class="summary-actions">
+          <button id="cancelarTodo" class="btn danger">Cancelar pedido</button>
+          <button class="btn ghost">Imprimir</button>
+          <button id="enviarPedido" class="btn primary">Enviar pedido</button>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- MODAL DE DETALLE -->
+    <div class="pedido-detalle-modal hidden" id="pedidoDetalle">
+      <div class="pedido-detalle-content">
+        
+        <h2 id="pedidoTitulo"></h2>
+        <h3 id="pedidoMesa" style="margin-bottom:15px;"></h3>
+
+        <ul id="pedidoProductos"></ul>
+
+        <div class="pedido-detalle-totales" style="margin-top:20px;">
+          <p>Subtotal: <span id="detalleSubtotal"></span></p>
+          <p><strong>Total: <span id="detalleTotal"></span></strong></p>
+        </div>
+
+        <div class="pedido-detalle-actions">
+          <button id="cerrarDetalle" class="btn primary">Cerrar</button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- NECESARIO PARA EL JS -->
+<script> let mesaSeleccionada = null; </script>
+
+<!-- BACKEND READY JS -->
+<script src="JSPOSV1_BACKEND_READY.js"></script>
+
+</body>
+</html>
