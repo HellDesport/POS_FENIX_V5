@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Punto de Venta - Restaurante</title>
+  <link rel="stylesheet" href="STYLEPOSV1.css" />
+</head>
+
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-circle">FX</div>
+      <div class="logo-text">
+        <span class="logo-title">RESTAURANTE OASIS</span>
+        <span class="logo-subtitle">POS FENIX</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="#" class="nav-item active"><span class="nav-dot"></span>Platillos</a>
+        <a href="#" class="nav-item"><span class="nav-dot"></span>Mesas</a>
+        <a href="#" class="nav-item"><span class="nav-dot"></span>Pedidos</a>
+    </nav>
+
+
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item small"><span class="nav-dot"></span>Configuración</a>
+      <a href="#" class="nav-item small danger"><span class="nav-dot"></span>Cerrar sesión</a>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="search-wrapper">
+        <input type="text" placeholder="Buscar menú, pedidos, mesas y más" class="search-input" />
+      </div>
+
+      <div class="user-info">
+        <div class="user-text">
+          <span class="user-name">Leonardo</span>
+          <span class="user-role">Mesero X</span>
+        </div>
+        <div class="user-avatar">LE</div>
+      </div>
+    </header>
+
+    <div class="content-wrapper">
+
+      <!-- COLUMNA PRINCIPAL (Platillos) -->
+      <section class="center-column">
+
+        <!-- MENÚ -->
+        <section class="card menu-section">
+          <div class="section-header">
+            <h2>Menú</h2>
+
+            <div class="chip-group" data-chip-group="menu-category">
+                <button class="chip active" data-category="all">Todo</button>
+                <button class="chip" data-category="tacos">Tacos</button>
+                <button class="chip" data-category="hamburguesas">Hamburguesas</button>
+                <button class="chip" data-category="antojitos">Antojitos</button>
+                <button class="chip" data-category="bebidas">Bebidas</button>
+            </div>
+
+          </div>
+          
+
+          <div class="menu-grid">
+
+            <article class="menu-card" data-category="tacos">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Tacos</span>
+                <h3>Taco Arabe</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$39</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+
+            </article>
+            <article class="menu-card" data-category="tacos">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Tacos</span>
+                <h3>Taco Oriental</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$18</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="tacos">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Tacos</span>
+                <h3>Topin de Queso</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$10</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="tacos">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Tacos</span>
+                <h3>Taco Carnitas en Arabe</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$45</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="tacos">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Tacos</span>
+                <h3>Taco Costra Pastor/Arabe</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$100</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="tacos">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Tacos</span>
+                <h3>Mar y Tierra</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$145</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="tacos">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Tacos</span>
+                <h3>Orden de 6 Suadero/Asada</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$100</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="tacos">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Tacos</span>
+                <h3>Taco al Pastor</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$39</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="hamburguesas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Hamburguesas</span>
+                <h3>Doble Carne</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$120</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="hamburguesas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Hamburguesas</span>
+                <h3>Pastor</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$75</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="hamburguesas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Hamburguesas</span>
+                <h3>Clasica de Res</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$75</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="hamburguesas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Hamburguesas</span>
+                <h3>Campechana</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$95</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="hamburguesas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Hamburguesas</span>
+                <h3>Sencilla</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$65</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="hamburguesas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Hamburguesas</span>
+                <h3>Nachos Asada y Suadero</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$120</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="antojitos">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Antojitos</span>
+                <h3>Chilaquiles Sencillos</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$85</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="bebidas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Bebidas</span>
+                <h3>Agua de Horchata 1/2</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$30</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="bebidas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Bebidas</span>
+                <h3>Agua de Jamaica 1/2</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$30</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="bebidas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Bebidas</span>
+                <h3>Limonada</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$30</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="bebidas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Bebidas</span>
+                <h3>Refresco 500ml</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$30</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="bebidas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Bebidas</span>
+                <h3>Refresco 355ml</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$20</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="menu-card" data-category="bebidas">
+              <div class="menu-image"></div>
+              <div class="menu-body">
+                <span class="menu-tag">Bebidas</span>
+                <h3>Agua Embotellada</h3>
+                <div class="menu-footer">
+                  <span class="menu-price">$20</span>
+                  <button class="menu-add">+</button>
+                </div>
+              </div>
+            </article>
+
+          </div>
+        </section>
+      </section>
+
+      <!-- SECCIÓN MESAS -->
+      <section class="mesas-section card" style="display:none;">
+        <div class="mesas-header">
+          <h2>Mapa de Mesas</h2>
+
+          <div class="legend">
+            <span class="legend-item"><span class="circle verde"></span>Libre</span>
+            <span class="legend-item"><span class="circle rojo"></span>Ocupada</span>
+            <span class="legend-item"><span class="circle amarillo"></span>Reservada</span>
+          </div>
+        </div>
+
+        <div class="grid-mesas" id="gridMesas"></div>
+      </section>
+
+      <!-- SECCIÓN PEDIDOS -->
+      <section class="pedidos-section card" style="display:none;">
+        <div class="section-header">
+          <h2>Pedidos</h2>
+
+          <div class="chip-group" data-chip-group="pedidos-filter">
+            <button class="chip active" data-status="all">Todos</button>
+            <button class="chip" data-status="waitlist">En espera</button>
+            <button class="chip" data-status="ready">Listos</button>
+            <button class="chip" data-status="served">Servidos</button>
+          </div>
+        </div>
+
+        <div class="pedidos-grid" id="pedidosGrid"></div>
+      </section>
+
+      <!-- COLUMNA DERECHA -->
+      <aside class="right-column card">
+        <div class="order-summary-header">
+          <div>
+            <div class="table-label">Mesa Nº 04</div>
+            <div class="order-code">Pedido #003</div>
+          </div>
+          <div class="people-count">
+            <span>2</span>
+            <span>Personas</span>
+          </div>
+        </div>
+
+        <div class="ordered-items">
+          <h3>Platillos pedidos</h3>
+          <ul id="orderItemsList">
+            <li><span>2x Taco Arabe</span><span>$78</span></li>
+            <li><span>2x Taco al Pastor</span><span>$78</span></li>
+            <li><span>1x Doble Carne</span><span>$120</span></li>
+            <li><span>1x Nachos Asada y Suadero</span><span>$120</span></li>
+          </ul>
+        </div>
+
+        <div class="payment-summary">
+          <h3>Resumen de pago</h3>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>$396</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total a pagar</span>
+            <span>$396</span>
+          </div>
+        </div>
+
+        <div class="payment-method">
+          <h3>Método de pago</h3>
+          <div class="chip-group" data-chip-group="payment">
+            <button class="chip active" data-method="cash">Efectivo</button>
+            <button class="chip" data-method="card">Tarjeta</button>
+          </div>
+        </div>
+
+        <div class="summary-actions">
+          <button class="btn ghost">Imprimir</button>
+          <button class="btn primary">Enviar pedido</button>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+</div>
+
+<script src="JSPOSV1.js"></script>
+</body>
+</html>
+
