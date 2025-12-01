@@ -40,6 +40,8 @@ import terminalRoutes from "./modules/terminal/terminal.routes.js";
 import productosRoutes from "./modules/terminal/productos/productos.routes.js";
 import printerRoutes from "./printer/printer.routes.js";
 import ticketRoutes from "./modules/terminal/ticket/ticket.routes.js";
+import ordenesRoutes from "./modules/terminal/ordenes/ordenes.routes.js";
+import ordenDetalleRoutes from "./modules/terminal/orden_detalle/orden_detalle.routes.js";
 
 const app = express();
 app.use(express.json());
@@ -87,6 +89,8 @@ app.use("/api/terminal", terminalRoutes);
 app.use("/api/terminal/productos", productosRoutes);
 app.use("/api/printer", printerRoutes);
 app.use("/api/terminal/ticket", ticketRoutes);
+app.use("/api/terminal/ordenes", ordenesRoutes);
+app.use("/api/terminal/orden_detalle", ordenDetalleRoutes);
 
 // ============================================================
 // MANEJO DE ERRORES Y 404

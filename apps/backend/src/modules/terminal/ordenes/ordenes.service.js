@@ -1,47 +1,13 @@
+// apps/backend/src/modules/terminal/ordenes/ordenes.service.js
 import * as ordenRepo from "./ordenes.repo.js";
-import * as ticketSvc from "../ticket/ticket.service.js";
 
 /* ============================================================
-   SERVICE – ÓRDENES (ROL TERMINAL)  v0.4 + Integración Tickets
+   SERVICE – ÓRDENES (ROL TERMINAL)  v0.4
+   Nota: los TICKETS se generan sólo por TRIGGERS en MySQL.
+   Este service SOLO cambia estados y totales.
    ============================================================ */
 
-/* ------------ helpers red/endpoint (anti cuelgues) --------- */
-function ensurePrintEndpoint(url) {
-  const u = (url || "").trim();
-  if (!u) return "http://localhost:9100/print";
-  return u.endsWith("/print") ? u : `${u.replace(/\/+$/, "")}/print`;
-}
-
-async function fetchJsonWithTimeout(url, { method = "POST", headers, body } = {}, timeoutMs = 8000) {
-  const ac = new AbortController();
-  const t = setTimeout(() => ac.abort(), timeoutMs);
-  try {
-    const res = await fetch(url, { method, headers, body, signal: ac.signal });
-    const text = await res.text().catch(() => "");
-    if (!res.ok) throw new Error(`Printer ${res.status}: ${text || "sin detalle"}`);
-    return text ? JSON.parse(text) : {};
-  } finally {
-    clearTimeout(t);
-  }
-}
-
-export async function listarOrdenesAbiertas(restauranteId) {
-  return await ordenRepo.listarAbiertas(restauranteId);
-}
-
-export async function crearOrden(restauranteId, mesaId, usuarioId, tipo) {
-  const tiposValidos = ["AQUI", "LLEVAR", "DOMICILIO"];
-  if (!tiposValidos.includes(tipo)) throw new Error("Tipo de orden inválido");
-  return await ordenRepo.crearOrden({ restauranteId, mesaId, usuarioId, ordenTipo: tipo });
-}
-
-export async function obtenerOrden(restauranteId, ordenId) {
-  const orden = await ordenRepo.obtenerOrden(restauranteId, ordenId);
-  if (!orden) throw new Error("Orden no encontrada");
-  return orden;
-}
-
-/* -------------------- FLUJO DE ESTADOS -------------------- */
+/* -------------------- helpers estados -------------------- */
 const puede = (from, to) =>
   ({
     pendiente: ["en_proceso", "cancelada"],
@@ -51,66 +17,128 @@ const puede = (from, to) =>
     cancelada: [],
   }[from]?.includes(to));
 
+/* -------------------- helpers numéricos / IVA -------------------- */
+function round2(n) {
+  return Math.round((Number(n) || 0) * 100) / 100;
+}
+
+function calcIVA(base, modo, tasa) {
+  const t = Number(tasa || 0) / 100;
+  if (modo === "EXENTO") return 0;
+
+  // DESGLOSADO: base es subtotal sin IVA
+  if (modo === "DESGLOSADO") return round2(base * t);
+
+  // INCLUIDO: base es total con IVA; se despeja
+  const neto = base / (1 + t);
+  return round2(base - neto);
+}
+
+/**
+ * Calcula subtotal, IVA y total a partir del detalle,
+ * modo de impuesto, tasa, envío y ajuste.
+ */
+function calcTotalesFromDetalle(detalle, { modo, tasa, envio = 0, ajuste = 0 }) {
+  const subtotalBase = detalle.reduce(
+    (s, d) => s + Number(d.precio_unitario) * Number(d.cantidad),
+    0
+  );
+
+  let subtotal, iva, totalSinExtras;
+
+  if (modo === "DESGLOSADO") {
+    subtotal = round2(subtotalBase);
+    iva = calcIVA(subtotal, "DESGLOSADO", tasa);
+    totalSinExtras = round2(subtotal + iva);
+  } else if (modo === "INCLUIDO") {
+    totalSinExtras = round2(subtotalBase); // ya incluye IVA
+    iva = calcIVA(totalSinExtras, "INCLUIDO", tasa);
+    subtotal = round2(totalSinExtras - iva);
+  } else {
+    // EXENTO
+    subtotal = round2(subtotalBase);
+    iva = 0;
+    totalSinExtras = subtotal;
+  }
+
+  const total = round2(
+    totalSinExtras + Number(envio || 0) + Number(ajuste || 0)
+  );
+
+  return { subtotal, iva, total };
+}
+
 /* ============================================================
-   ENVÍO A COCINA — genera ticket de cocina automáticamente
+   LISTAR / CREAR / OBTENER
+   ============================================================ */
+
+export async function listarOrdenesAbiertas(restauranteId) {
+  return await ordenRepo.listarAbiertas(restauranteId);
+}
+
+export async function crearOrden(restauranteId, mesaId, usuarioId, tipo) {
+  const tiposValidos = ["AQUI", "LLEVAR", "DOMICILIO"];
+  if (!tiposValidos.includes(tipo)) throw new Error("Tipo de orden inválido");
+
+  return await ordenRepo.crearOrden({
+    restauranteId,
+    mesaId,
+    usuarioId,
+    ordenTipo: tipo,
+  });
+}
+
+export async function obtenerOrden(restauranteId, ordenId) {
+  const orden = await ordenRepo.obtenerOrden(restauranteId, ordenId);
+  if (!orden) throw new Error("Orden no encontrada");
+  return orden;
+}
+
+/* ============================================================
+   ENVÍO A COCINA  (pendiente → en_proceso)
+   Tickets COCINA generados por trigger.
    ============================================================ */
 export async function enviarACocina(restauranteId, ordenId, usuarioId) {
   const ord = await ordenRepo.getById(restauranteId, ordenId);
   if (!ord) throw new Error("Orden no encontrada");
-  if (!puede(ord.estado, "en_proceso")) throw new Error("Transición inválida");
 
-  await ordenRepo.cambiarEstado(restauranteId, ordenId, "en_proceso", { usuarioId });
-
-  try {
-    const data = await ordenRepo.getOrderPrintableData(ordenId);
-    const cfg = await ordenRepo.getCfg(restauranteId);
-    const impresora = cfg.impresora_cocina || "Generic / Text Only";
-    const endpoint = ensurePrintEndpoint(cfg.impresora_endpoint);
-
-    const payload = ticketSvc.buildKitchenPayload({
-      ticket: { id: null, tipo: "COCINA" },
-      data,
-      impresora,
-    });
-
-    await fetchJsonWithTimeout(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    await ordenRepo.insertTicket({
-      ordenId,
-      restauranteId,
-      tipo: "COCINA",
-      impresoraNombre: impresora,
-      impresoraEndpoint: endpoint,
-      generadoPor: usuarioId || null,
-    });
-
-    console.log(`🧾 Ticket de cocina generado correctamente para orden #${ordenId}`);
-  } catch (err) {
-    console.error(`⚠️ Error generando ticket de cocina: ${err.message}`);
+  if (!puede(ord.estado, "en_proceso")) {
+    throw new Error("Transición inválida");
   }
 
+  await ordenRepo.cambiarEstado(restauranteId, ordenId, "en_proceso", {
+    usuarioId,
+  });
+
+  // El trigger trg_ticket_por_estado generará el ticket COCINA
   return { id: ordenId, estado: "en_proceso" };
 }
 
 /* ============================================================
-   MARCAR COMO LISTO
+   MARCAR LISTO  (en_proceso → listo)
    ============================================================ */
 export async function marcarListo(restauranteId, ordenId) {
   const ord = await ordenRepo.getById(restauranteId, ordenId);
   if (!ord) throw new Error("Orden no encontrada");
-  if (!puede(ord.estado, "listo")) throw new Error("Transición inválida");
+
+  if (!puede(ord.estado, "listo")) {
+    throw new Error("Transición inválida");
+  }
+
   await ordenRepo.cambiarEstado(restauranteId, ordenId, "listo");
+
+  // No hay ticket asociado a este estado
   return { id: ordenId, estado: "listo" };
 }
 
 /* ============================================================
-   PAGAR — genera ticket de venta automáticamente
+   PAGAR — genera ticket VENTA vía trigger
    ============================================================ */
-export async function pagar(restauranteId, ordenId, { usuarioId, pagos = [], ajuste_redondeo = 0 } = {}) {
+export async function pagar(
+  restauranteId,
+  ordenId,
+  { usuarioId, pagos = [], ajuste_redondeo = 0 } = {}
+) {
   const ord = await ordenRepo.getById(restauranteId, ordenId);
   if (!ord) throw new Error("Orden no encontrada");
   if (!puede(ord.estado, "pagada")) throw new Error("Transición inválida");
@@ -118,108 +146,157 @@ export async function pagar(restauranteId, ordenId, { usuarioId, pagos = [], aju
   const det = await ordenRepo.listDetalle(ordenId);
   const cfg = await ordenRepo.getCfg(restauranteId);
 
-  const subtotal = round2(det.reduce((s, d) => s + Number(d.precio_unitario) * Number(d.cantidad), 0));
-  const iva = calcIVA(subtotal, cfg.impuesto_modo, cfg.impuesto_tasa);
+  const modo =
+    ord.iva_modo_en_venta || cfg.impuesto_modo || "INCLUIDO";
+  const tasa =
+    ord.iva_tasa_en_venta ?? cfg.impuesto_tasa ?? 16.0;
+
   const envio = Number(ord.envio_monto || 0);
   const ajuste = Number(ajuste_redondeo || 0);
-  const total = round2(subtotal + iva + envio + ajuste);
 
-  await ordenRepo.actualizarTotales(ordenId, { subtotal, iva, total, ajuste_redondeo: ajuste });
+  const { subtotal, iva, total } = calcTotalesFromDetalle(det, {
+    modo,
+    tasa,
+    envio,
+    ajuste,
+  });
 
+  // Guardar totales
+  await ordenRepo.actualizarTotales(ordenId, {
+    subtotal,
+    iva,
+    total,
+    ajuste_redondeo: ajuste,
+  });
+
+  // Registrar pagos
   for (const p of pagos) {
-    await ordenRepo.insertPago(ordenId, p.medio, Number(p.monto || 0), p.nota_medio || null);
-  }
-
-  await ordenRepo.cambiarEstado(restauranteId, ordenId, "pagada", { usuarioId });
-
-  try {
-    const data = await ordenRepo.getOrderPrintableData(ordenId);
-    const impresora = cfg.impresora_terminal || "Microsoft Print to PDF";
-    const endpoint = ensurePrintEndpoint(cfg.impresora_endpoint);
-
-    const payload = ticketSvc.buildSalePayload({
-      ticket: { id: null, tipo: "VENTA" },
-      data,
-      impresora,
-    });
-
-    await fetchJsonWithTimeout(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    await ordenRepo.insertTicket({
+    await ordenRepo.insertPago(
       ordenId,
-      restauranteId,
-      tipo: "VENTA",
-      impresoraNombre: impresora,
-      impresoraEndpoint: endpoint,
-      generadoPor: usuarioId || null,
-    });
-
-    console.log(`💰 Ticket de venta generado correctamente para orden #${ordenId}`);
-  } catch (err) {
-    console.error(`⚠️ Error generando ticket de venta: ${err.message}`);
+      p.medio,
+      Number(p.monto || 0),
+      p.nota_medio || null
+    );
   }
 
-  return { id: ordenId, estado: "pagada", subtotal, iva, envio_monto: envio, ajuste_redondeo: ajuste, total };
+  // Cambiar estado → el trigger creará ticket VENTA
+  await ordenRepo.cambiarEstado(restauranteId, ordenId, "pagada", {
+    usuarioId,
+  });
+
+  return { id: ordenId, estado: "pagada", subtotal, iva, total };
 }
 
 /* ============================================================
-   CANCELAR ORDEN
+   CANCELAR ORDEN — ticket CANCELACION por trigger
    ============================================================ */
 export async function cancelar(restauranteId, ordenId, usuarioId) {
   const ord = await ordenRepo.getById(restauranteId, ordenId);
   if (!ord) throw new Error("Orden no encontrada");
   if (!puede(ord.estado, "cancelada")) throw new Error("Transición inválida");
 
-  await ordenRepo.cambiarEstado(restauranteId, ordenId, "cancelada", { usuarioId });
+  await ordenRepo.cambiarEstado(restauranteId, ordenId, "cancelada", {
+    usuarioId,
+  });
 
-  try {
-    await ordenRepo.insertTicket({
-      ordenId,
-      restauranteId,
-      tipo: "CANCELACION",
-      impresoraNombre: null,
-      impresoraEndpoint: null,
-      generadoPor: usuarioId || null,
-    });
-    console.log(`🗑️ Ticket de cancelación registrado para orden #${ordenId}`);
-  } catch (err) {
-    console.error("⚠️ Error registrando ticket de cancelación:", err.message);
-  }
-
+  // El trigger inserta ticket tipo CANCELACION (solo registro)
   return { id: ordenId, estado: "cancelada" };
 }
 
 /* ============================================================
-   SOPORTE DOMICILIO / COMPATIBILIDAD
+   CONFIGURAR FACTURA (IVA INCLUIDO / DESGLOSADO)
+   - Actualiza iva_modo_en_venta / iva_tasa_en_venta
+   - Recalcula subtotal / IVA / total
    ============================================================ */
-export async function setEnvioMonto(restauranteId, ordenId, envio) {
+export async function configurarFactura(restauranteId, ordenId, factura) {
   const ord = await ordenRepo.getById(restauranteId, ordenId);
   if (!ord) throw new Error("Orden no encontrada");
-  if (ord.orden_tipo !== "DOMICILIO") throw new Error("envio_monto solo aplica a DOMICILIO");
-  if (isNaN(envio) || envio < 0) throw new Error("envio_monto inválido");
+
+  const cfg = await ordenRepo.getCfg(restauranteId);
+  const tasa = Number(cfg.impuesto_tasa ?? 16);
+
+  const modo = factura ? "DESGLOSADO" : "INCLUIDO";
+  await ordenRepo.updateIVAMode(ordenId, modo, tasa);
+
+  const det = await ordenRepo.listDetalle(ordenId);
+  const envio = Number(ord.envio_monto || 0);
+  const ajuste = Number(ord.ajuste_redondeo || 0);
+
+  const { subtotal, iva, total } = calcTotalesFromDetalle(det, {
+    modo,
+    tasa,
+    envio,
+    ajuste,
+  });
+
+  await ordenRepo.actualizarTotales(ordenId, {
+    subtotal,
+    iva,
+    total,
+    ajuste_redondeo: ajuste,
+  });
+
+  return {
+    id: ordenId,
+    factura: !!factura,
+    iva_modo: modo,
+    iva_tasa: tasa,
+    subtotal,
+    iva,
+    total,
+  };
+}
+
+/* ============================================================
+   SET ENVÍO (DOMICILIO) — recalcula totales
+   ============================================================ */
+export async function setEnvioMonto(
+  restauranteId,
+  ordenId,
+  { envio_monto } = {}
+) {
+  const ord = await ordenRepo.getById(restauranteId, ordenId);
+  if (!ord) throw new Error("Orden no encontrada");
+
+  // Opcional: restringir a DOMICILIO
+  if (ord.orden_tipo !== "DOMICILIO") {
+    throw new Error("El envío solo aplica para órdenes de DOMICILIO");
+  }
+
+  const envio = round2(envio_monto ?? 0);
+
+  // Actualizar campo envio_monto
   await ordenRepo.updateEnvio(ordenId, envio);
-  return { id: ordenId, envio_monto: envio };
-}
 
-export async function cerrarOrden(restauranteId, ordenId, estado) {
-  const validos = ["pagada", "cancelada"];
-  if (!validos.includes(estado)) throw new Error("Estado inválido");
-  if (estado === "pagada") return pagar(restauranteId, ordenId, {});
-  if (estado === "cancelada") return cancelar(restauranteId, ordenId);
-  return null;
-}
+  // Recalcular totales con el nuevo envío
+  const det = await ordenRepo.listDetalle(ordenId);
+  const cfg = await ordenRepo.getCfg(restauranteId);
 
-/* -------------------- helpers -------------------- */
-function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
-function calcIVA(subtotal, modo, tasa) {
-  const t = Number(tasa || 0) / 100;
-  if (modo === "EXENTO") return 0;
-  if (modo === "DESGLOSADO") return round2(subtotal * t);
-  // INCLUIDO
-  const base = subtotal / (1 + t);
-  return round2(subtotal - base);
+  const modo =
+    ord.iva_modo_en_venta || cfg.impuesto_modo || "INCLUIDO";
+  const tasa =
+    ord.iva_tasa_en_venta ?? cfg.impuesto_tasa ?? 16.0;
+  const ajuste = Number(ord.ajuste_redondeo || 0);
+
+  const { subtotal, iva, total } = calcTotalesFromDetalle(det, {
+    modo,
+    tasa,
+    envio,
+    ajuste,
+  });
+
+  await ordenRepo.actualizarTotales(ordenId, {
+    subtotal,
+    iva,
+    total,
+    ajuste_redondeo: ajuste,
+  });
+
+  return {
+    id: ordenId,
+    envio_monto: envio,
+    subtotal,
+    iva,
+    total,
+  };
 }

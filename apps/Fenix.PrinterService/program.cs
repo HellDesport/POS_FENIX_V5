@@ -8,13 +8,18 @@ var builder = WebApplication.CreateBuilder(args);
 // ======================================================
 // REGISTRO DE SERVICIOS
 // ======================================================
+
+// Controladores API
 builder.Services.AddControllers();
 
-// Servicio principal de impresión
+// Servicio principal que genera ESC/POS
 builder.Services.AddSingleton<PrinterService>();
 
-// Servicio que lista impresoras instaladas
+// Servicio que lista impresoras instaladas en Windows
 builder.Services.AddSingleton<PrinterManager>();
+
+
+builder.Services.AddHostedService<TicketWorker>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -30,6 +35,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Endpoint de salud del microservicio
 app.MapGet("/ping", () =>
 {
     return Results.Json(new { message = "Printer OK" });

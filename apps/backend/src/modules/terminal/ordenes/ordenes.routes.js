@@ -18,10 +18,12 @@ router.get("/:id", ctrl.obtener);
 router.post("/", ctrl.crear);
 
 // Flujo de estados
+
 router.put("/:id/enviar-a-cocina", ctrl.enviarACocina);     // -> en_proceso (imprime COCINA)
 router.put("/:id/listo",           ctrl.marcarListo);       // -> listo (sin ticket)
 router.put("/:id/pagar",           ctrl.pagar);             // -> pagada (imprime VENTA)
 router.put("/:id/cancelar",        ctrl.cancelar);          // -> cancelada (registro)
+router.put("/:id/factura",         ctrl.configurarFactura); // -> INCLUIDO / DESGLOSADO IVA
 
 router.put("/:id/envio",           ctrl.setEnvioMonto);     // DOMICILIO: set envío
 

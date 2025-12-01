@@ -144,14 +144,20 @@ export async function insertTicket({
   impresoraEndpoint,
   generadoPor
 }) {
-  await pool.query(
+  const [result] = await pool.query(
     `INSERT INTO ticket (
-        orden_id, restaurante_id, tipo, impresora_nombre, impresora_endpoint, generado_por
+        orden_id,
+        restaurante_id,
+        tipo,
+        impresora_nombre,
+        impresora_endpoint,
+        generado_por
      ) VALUES (?, ?, ?, ?, ?, ?)`,
-    [ordenId, restauranteId, tipo, impresoraNombre || null, impresoraEndpoint || null, generadoPor || null]
+    [ordenId, restauranteId, tipo, impresoraNombre, impresoraEndpoint, generadoPor]
   );
-}
 
+  return result.insertId;
+}
 /* -------------------- Datos para construir ticket -------------------- */
 /**
  * Devuelve:
@@ -196,9 +202,24 @@ export async function getOrderPrintableData(ordenId) {
     [orden?.restaurante_id]
   );
 
+  
+
   return {
     orden: orden || null,
     detalle,
     cfg: cfg || { impuesto_modo: "INCLUIDO", impuesto_tasa: 16.0, mostrar_desglose_iva_en_ticket: 0, serie_folio: null }
   };
+}
+
+
+/* -------------------- IVA / FACTURA -------------------- */
+export async function updateIVAMode(ordenId, modo, tasa) {
+  await pool.query(
+    `UPDATE orden
+        SET iva_modo_en_venta = ?, 
+            iva_tasa_en_venta = ?, 
+            updated_at = NOW()
+      WHERE id = ?`,
+    [modo, tasa, ordenId]
+  );
 }

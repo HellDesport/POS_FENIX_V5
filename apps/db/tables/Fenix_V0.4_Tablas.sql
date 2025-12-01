@@ -365,7 +365,7 @@ CREATE TABLE ticket (
   restaurante_id     BIGINT UNSIGNED NOT NULL,
   tipo               ENUM('VENTA','REIMPRESION','COCINA','CANCELACION') NOT NULL DEFAULT 'VENTA',
   contenido_qr       VARCHAR(255) DEFAULT NULL,
-  contenido_json     JSON DEFAULT NULL,
+  contenido_json TEXT NULL,
   copias_generadas   SMALLINT UNSIGNED DEFAULT 0,
   impresora_nombre   VARCHAR(120) DEFAULT NULL,
   impresora_endpoint VARCHAR(200) DEFAULT NULL,

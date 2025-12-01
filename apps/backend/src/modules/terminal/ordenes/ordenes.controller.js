@@ -92,3 +92,15 @@ export async function cerrar(req, res, next) {
     res.json({ ok: true, data });
   } catch (err) { next(err); }
 }
+
+export async function configurarFactura(req, res, next) {
+  try {
+    const restauranteId = req.restaurante?.id;
+    const { id } = req.params;
+    const { factura } = req.body; // true = desglose, false = incluido
+
+    const data = await ordenService.configurarFactura(restauranteId, id, factura);
+    res.json({ ok: true, data });
+
+  } catch (err) { next(err); }
+}
