@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fénix | Panel del Propietario</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <header class="brand">
+            <h1>SISTEMA_POS</h1>
+            <p class="muted">• Resumen</p>
+        </header>
+
+        <hr>
+
+        <section class="kpi-col">
+            <article class="kpi">
+            <h3>Venta del día</h3>
+            <div class="kpi-value"><span>$0.00</span> MXN</div>
+            </article>
+
+            <article class="kpi">
+            <h3>Tickets</h3>
+            <div class="kpi-num"><span>0</span></div>
+            </article>
+
+            <article class="kpi">
+            <h3>Órdenes abiertas</h3>
+            <div class="kpi-num"><span>0</span></div>
+            </article>
+
+            <article class="kpi">
+            <h3>Mesas</h3>
+            <div class="kpi-num"><span>0</span></div>
+            </article>
+        </section>
+
+        <button id="btnLogout" class="btn btn-danger w-full">
+            Cerrar sesión
+        </button>
+        </aside>
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <header class="mainbar">
+        <h2>Configuración del Restaurante</h2>
+      </header>
+
+      <!-- Tarjetas -->
+      <section class="cards">
+        <article class="card">
+          <h3>Estado de restaurante</h3>
+          <p>Estatus: <b>INACTIVO</b></p>
+          <div class="card-actions">
+            <a class="btn" href="#">Administrar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Menú del restaurante</h3>
+          <p>No disponibles: <b>0</b></p>
+          <div class="card-actions">
+            <a class="btn" href="#">Modificar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Dispositivos e impresoras</h3>
+          <p>Conectadas: <b>0</b></p>
+          <div class="card-actions">
+            <a class="btn" href="#">Configurar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Tickets y corte</h3>
+          <p>Hoy: 0 — Venta: $0.00</p>
+          <div class="card-actions">
+            <a class="btn" href="#">Ver Tickets</a>
+            <a class="btn" href="#">Órdenes</a>
+          </div>
+        </article>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section class="analytics">
+        <article class="chart-card">
+          <h3>Ventas últimos 7 días</h3>
+          <div class="chart-placeholder"></div>
+        </article>
+
+        <article class="chart-card">
+          <h3>Ventas por hora (hoy)</h3>
+          <div class="chart-placeholder"></div>
+        </article>
+      </section>
+
+    </main>
+  </div>
+</body>
+</html>
