@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fénix | Restablecer contraseña</title>
+
+  <link rel="stylesheet" href="../../../styles/base.css" />
+  <link rel="stylesheet" href="auth.css" />
+  <link rel="icon" href="../../../assets/icons/logo.svg" type="image/svg+xml" />
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- PANEL IZQUIERDO – FORMULARIO -->
+  <div class="form-container sign-in">
+    <form id="frmReset" novalidate>
+
+      <h1>Restablecer contraseña</h1>
+      <p style="font-size:13px; color:#666; margin-bottom:20px;">
+        Ingresa tu nueva contraseña.  
+        El enlace ya fue validado desde tu correo.
+      </p>
+
+      <div class="pwd-wrap" style="width:100%;">
+        <input id="password" name="password" type="password" placeholder="Nueva contraseña" minlength="6" required />
+        <button id="togglePwd" type="button" class="link" style="font-size:12px;margin-top:8px;">Mostrar</button>
+      </div>
+
+      <div class="pwd-wrap" style="width:100%;">
+        <input id="password2" name="password2" type="password" placeholder="Confirmar contraseña" minlength="6" required />
+        <button id="togglePwd2" type="button" class="link" style="font-size:12px;margin-top:8px;">Mostrar</button>
+      </div>
+
+      <button id="btnSubmit" type="submit">Guardar nueva contraseña</button>
+
+      <p id="msg" class="msg"></p>
+
+      <a href="login.html" style="margin-top:12px; font-size:13px;">Volver a iniciar sesión</a>
+
+    </form>
+  </div>
+
+  <!-- PANEL DERECHO – MENSAJE -->
+  <div class="toggle-container">
+    <div class="toggle">
+      <div class="toggle-panel toggle-right">
+        <h1>¿Olvidaste tu contraseña?</h1>
+        <p>
+          No pasa nada.  
+          Solo escribe tu nueva contraseña para recuperar tu acceso.
+        </p>
+
+        <a href="login.html">
+          <button class="hidden">Iniciar sesión</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module" src="./reset.js"></script>
+
+</body>
+</html>

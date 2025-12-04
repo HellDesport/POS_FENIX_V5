@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fénix | Crear cuenta (Propietario)</title>
+
+  <link rel="stylesheet" href="../../../styles/base.css" />
+  <link rel="stylesheet" href="auth.css" />
+  <link rel="icon" href="../../../assets/icons/logo.svg" type="image/svg+xml" />
+</head>
+
+<body>
+
+<div class="container" id="registerContainer">
+
+  <!-- === PANEL FORMULARIO (lado izquierdo) === -->
+  <div class="form-container sign-in">
+    <form id="frmRegister" novalidate>
+      
+      <h1>Crear cuenta</h1>
+
+      <input id="nombre" name="nombre" type="text" placeholder="Tu nombre" required />
+
+      <input id="email" name="email" type="email" placeholder="tu@oasis.mx" required />
+
+      <div class="pwd-wrap" style="width:100%;">
+        <input id="password" name="password" type="password" placeholder="Contraseña" minlength="6" required />
+        <button id="togglePwd" type="button" class="link" style="font-size:12px;margin-top:8px;">Mostrar</button>
+      </div>
+
+      <div class="pwd-wrap" style="width:100%;">
+        <input id="password2" name="password2" type="password" placeholder="Confirmar contraseña" minlength="6" required />
+        <button id="togglePwd2" type="button" class="link" style="font-size:12px;margin-top:8px;">Mostrar</button>
+      </div>
+
+      <button id="btnSubmit" type="submit">Crear cuenta</button>
+
+      <p id="msg" class="msg"></p>
+    </form>
+  </div>
+
+  <!-- === PANEL DERECHO (imagen / texto) === -->
+  <div class="toggle-container">
+    <div class="toggle">
+      <div class="toggle-panel toggle-right">
+        <h1>Bienvenido!</h1>
+        <p>Ingresa tus datos para crear una cuenta y comenzar a utilizar Fénix POS.</p>
+
+        <a href="login.html">
+          <button class="hidden">Iniciar sesión</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module" src="./register.js"></script>
+
+</body>
+</html>

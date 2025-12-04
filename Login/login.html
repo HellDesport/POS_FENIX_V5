@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fénix | Iniciar sesión (Propietario)</title>
+
+  <link rel="stylesheet" href="/styles/base.css">
+  <link rel="stylesheet" href="auth.css">
+  <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+  <link rel="icon" href="/assets/icons/logo.svg" type="image/svg+xml">
+</head>
+
+<body>
+
+<div class="container" id="loginContainer">
+
+  <!-- === PANEL DEL LOGIN (lado izquierdo) === -->
+  <div class="form-container sign-in">
+    <form id="frmLogin" novalidate>
+
+      <h1>Bienvenido de Vuelta!</h1>
+
+      <input id="email" name="email" type="email" placeholder="Email" required />
+
+      <div class="pwd-wrap" style="width:100%;">
+        <input id="password" name="password" type="password" placeholder="Contraseña" minlength="6" required />
+        <button id="btnTogglePwd" type="button" class="link" style="font-size:12px;margin-top:8px;">Mostrar</button>
+      </div>
+
+      <a href="reset.html">¿Olvidaste tu contraseña?</a>
+
+      <button id="btnSubmit" type="submit">Ingresar</button>
+
+      <p id="msg" class="msg" style="height:20px;"></p>
+    </form>
+  </div>
+
+  <!-- === PANEL DERECHO (estético / registro) === -->
+  <div class="toggle-container">
+    <div class="toggle">
+      <div class="toggle-panel toggle-right">
+        <h1>Hola!</h1>
+        <p>Regístrate con tus datos personales para utilizar todas las funciones del sitio.</p>
+
+        <a href="register.html">
+          <button class="hidden">Registrarse</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Tu lógica -->
+<script type="module" src="auth.js"></script>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("email")?.focus();
+  });
+</script>
+
+</body>
+</html>
+
